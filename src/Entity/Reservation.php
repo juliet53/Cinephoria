@@ -20,10 +20,10 @@ class Reservation
     private ?float $prix = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
-    private ?user $user = null;
+    private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
-    private ?seance $seance = null;
+    private ?Seance $seance = null;
 
     public function getId(): ?int
     {
@@ -54,24 +54,24 @@ class Reservation
         return $this;
     }
 
-    public function getUser(): ?user
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?user $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getSeance(): ?seance
+    public function getSeance(): ?Seance
     {
         return $this->seance;
     }
 
-    public function setSeance(?seance $seance): static
+    public function setSeance(?Seance $seance): static
     {
         $this->seance = $seance;
 

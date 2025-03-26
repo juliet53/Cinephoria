@@ -23,16 +23,16 @@ class Seance
     private ?\DateTimeInterface $dateHeureFin = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $qualité = null;
+    private ?string $qualite = null; // Suppression de l'accent
 
     #[ORM\Column]
     private ?int $placeDisponible = null;
 
     #[ORM\ManyToOne(inversedBy: 'seances')]
-    private ?film $film = null;
+    private ?Film $film = null; // Correction de la casse
 
     #[ORM\ManyToOne(inversedBy: 'seances')]
-    private ?salle $salle = null;
+    private ?Salle $salle = null; // Correction de la casse
 
     /**
      * @var Collection<int, Reservation>
@@ -74,14 +74,14 @@ class Seance
         return $this;
     }
 
-    public function getQualité(): ?string
+    public function getQualite(): ?string
     {
-        return $this->qualité;
+        return $this->qualite;
     }
 
-    public function setQualité(string $qualité): static
+    public function setQualite(string $qualite): static
     {
-        $this->qualité = $qualité;
+        $this->qualite = $qualite;
 
         return $this;
     }
@@ -98,24 +98,24 @@ class Seance
         return $this;
     }
 
-    public function getFilm(): ?film
+    public function getFilm(): ?Film
     {
         return $this->film;
     }
 
-    public function setFilm(?film $film): static
+    public function setFilm(?Film $film): static
     {
         $this->film = $film;
 
         return $this;
     }
 
-    public function getSalle(): ?salle
+    public function getSalle(): ?Salle
     {
         return $this->salle;
     }
 
-    public function setSalle(?salle $salle): static
+    public function setSalle(?Salle $salle): static
     {
         $this->salle = $salle;
 
