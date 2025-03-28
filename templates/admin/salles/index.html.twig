@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Salles{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Liste des Salles</h1>
+            <a href="{{ path('admin_salles_new') }}" class="btn btn-success">Ajouter une Salle</a>
+        </div>
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Numéro</th>
+                    <th>Capacité</th>
+                    <th>Cinéma</th> <!-- Nouvelle colonne pour le cinéma -->
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for salle in salles %}
+                    <tr>
+                        <td>{{ salle.id }}</td>
+                        <td>{{ salle.numero }}</td>
+                        <td>{{ salle.capacite }}</td>
+                        <td>{{ salle.cinema.ville ?? 'Non défini' }}</td> <!-- Affichage du cinéma associé -->
+                        <td>
+                            <a href="{{ path('admin_salles_edit', {'id': salle.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                            <form action="{{ path('admin_salles_delete', {'id': salle.id}) }}" method="post" class="d-inline"
+                                  onsubmit="return confirm('Voulez-vous vraiment supprimer cette salle ?');">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Aucune salle enregistrée</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

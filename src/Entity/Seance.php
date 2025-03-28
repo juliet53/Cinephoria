@@ -23,22 +23,25 @@ class Seance
     private ?\DateTimeInterface $dateHeureFin = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $qualite = null; // Suppression de l'accent
+    private ?string $qualite = null; 
 
     #[ORM\Column]
     private ?int $placeDisponible = null;
 
     #[ORM\ManyToOne(inversedBy: 'seances')]
-    private ?Film $film = null; // Correction de la casse
+    private ?Film $film = null; 
 
     #[ORM\ManyToOne(inversedBy: 'seances')]
-    private ?Salle $salle = null; // Correction de la casse
+    private ?Salle $salle = null; 
 
     /**
      * @var Collection<int, Reservation>
      */
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'seance')]
     private Collection $reservations;
+
+    #[ORM\Column]
+    private ?float $prix = null;
 
     public function __construct()
     {
@@ -148,6 +151,18 @@ class Seance
                 $reservation->setSeance(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPrix(): ?float
+    {
+        return $this->prix;
+    }
+
+    public function setPrix(float $prix): static
+    {
+        $this->prix = $prix;
 
         return $this;
     }

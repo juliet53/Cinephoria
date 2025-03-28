@@ -18,11 +18,9 @@ class Film
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $rating = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $crush = null;
@@ -42,10 +40,17 @@ class Film
     #[ORM\OneToMany(targetEntity: Seance::class, mappedBy: 'film')]
     private Collection $seances;
 
+    /**
+     * @var Collection<int, Genre>
+     */
+    #[ORM\ManyToMany(targetEntity: Genre::class, mappedBy: 'film')]
+    private Collection $genres;
+
     public function __construct()
     {
         $this->avis = new ArrayCollection();
         $this->seances = new ArrayCollection();
+        $this->genres = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -77,17 +82,7 @@ class Film
         return $this;
     }
 
-    public function getRating(): ?float
-    {
-        return $this->rating;
-    }
-
-    public function setRating(?float $rating): static
-    {
-        $this->rating = $rating;
-
-        return $this;
-    }
+    
 
     public function isCrush(): ?bool
     {
@@ -168,6 +163,33 @@ class Film
             if ($seance->getFilm() === $this) {
                 $seance->setFilm(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Genre>
+     */
+    public function getGenres(): Collection
+    {
+        return $this->genres;
+    }
+
+    public function addGenre(Genre $genre): static
+    {
+        if (!$this->genres->contains($genre)) {
+            $this->genres->add($genre);
+            $genre->addFilm($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGenre(Genre $genre): static
+    {
+        if ($this->genres->removeElement($genre)) {
+            $genre->removeFilm($this);
         }
 
         return $this;

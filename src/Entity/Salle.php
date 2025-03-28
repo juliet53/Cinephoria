@@ -21,7 +21,7 @@ class Salle
     #[ORM\Column]
     private ?int $capacite = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $qualite = null;
 
     /**
@@ -29,6 +29,9 @@ class Salle
      */
     #[ORM\OneToMany(targetEntity: Seance::class, mappedBy: 'salle')]
     private Collection $seances;
+
+    #[ORM\ManyToOne(inversedBy: 'salle')]
+    private ?Cinema $cinema = null;
 
     public function __construct()
     {
@@ -102,6 +105,18 @@ class Salle
                 $seance->setSalle(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCinema(): ?Cinema
+    {
+        return $this->cinema;
+    }
+
+    public function setCinema(?Cinema $cinema): static
+    {
+        $this->cinema = $cinema;
 
         return $this;
     }

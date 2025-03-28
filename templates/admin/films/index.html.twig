@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Films{% endblock %}
+
+{% block body %}
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="card shadow-lg p-4 w-75">
+        <h1 class="mb-4 text-center text-primary">Gestion des Films 🎬</h1>
+
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ path('admin_films_new') }}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Ajouter un film
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Réalisateur</th>
+                        <th>Genres</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for film in films %}
+                        <tr>
+                            <td>{{ film.title }}</td>
+                            <td>{{ film.director }}</td>
+                            <td>
+                                {% for genre in film.genres %}
+                                    <span class="badge bg-info text-dark">{{ genre.nom }}</span>
+                                {% else %}
+                                    <span class="text-muted">Aucun genre</span>
+                                {% endfor %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ path('admin_films_edit', {'id': film.id}) }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
+                                <a href="{{ path('admin_films_delete', {'id': film.id}) }}" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirmDelete()">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Aucun film disponible</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    function confirmDelete() {
+        return confirm("Voulez-vous vraiment supprimer ce film ?");
+    }
+</script>
+
+{% endblock %}

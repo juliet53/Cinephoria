@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Cinéma{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">Modifier le Cinéma</h2>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+
+                    <div class="mb-3">
+                        {{ form_label(form.nom, 'Nom du Cinéma', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Cinéma Gaumont'}}) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.ville, 'Ville', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.ville, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Paris'}}) }}
+                        {{ form_errors(form.ville) }}
+                    </div>
+
+                    
+
+                    <button type="submit" class="btn btn-primary w-100">Sauvegarder</button>
+                    {{ form_end(form) }}
+
+                    <a href="{{ path('admin_cinema_index') }}" class="btn btn-outline-secondary mt-3 w-100">Retour</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

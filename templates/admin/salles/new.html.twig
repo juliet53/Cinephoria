@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une Salle{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2>Nouvelle Salle</h2>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.numero, 'Numéro', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.numero, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.capacite, 'Capacité', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.capacite, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+                    <div class="mb-3">
+                                {{ form_label(form.cinema, 'Cinéma', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(form.cinema, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.cinema) }}
+                    </div>
+
+                   
+                    <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

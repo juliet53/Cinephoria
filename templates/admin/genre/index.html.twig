@@ -1,0 +1,32 @@
+{# templates/admin/genre/index.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Genres{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Gestion des Genres</h1>
+        <a href="{{ path('admin_genre_new') }}" class="btn btn-success mb-4">Ajouter un Genre</a>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for genre in genres %}
+                    <tr>
+                        <td>{{ genre.nom }}</td>
+                        <td>
+                            <a href="{{ path('admin_genre_edit', {'id': genre.id}) }}" class="btn btn-warning">Modifier</a>
+                            <a href="{{ path('admin_genre_delete', {'id': genre.id}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce genre ?')">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

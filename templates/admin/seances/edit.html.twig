@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la Séance{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Modifier la Séance</h1>
+
+        {{ form_start(form) }}
+            <div class="mb-3">
+                {{ form_label(form.dateHeureDebut, 'Date et Heure de Début') }}
+                {{ form_widget(form.dateHeureDebut, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.dateHeureFin, 'Date et Heure de Fin') }}
+                {{ form_widget(form.dateHeureFin, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.qualite, 'Qualité') }}
+                {{ form_widget(form.qualite, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.placeDisponible, 'Places Disponibles') }}
+                {{ form_widget(form.placeDisponible, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.film, 'Film') }}
+                {{ form_widget(form.film, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.salle, 'Salle') }}
+                {{ form_widget(form.salle, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <!-- Ajout du champ prix -->
+            <div class="mb-3">
+                {{ form_label(form.prix, 'Prix') }}
+                {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <button type="submit" class="btn btn-primary">Sauvegarder</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le Film{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h2>Modifier le film : {{ film.title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                            <div class="mb-3">
+                                {{ form_label(form.title, 'Titre', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                {{ form_widget(form.crush, {'attr': {'class': 'form-check-input'}}) }}
+                                {{ form_label(form.crush, 'Coup de cœur', {'label_attr': {'class': 'form-check-label'}}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.director, 'Réalisateur', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.director, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Genres</label>
+                                <div class="d-flex flex-wrap">
+                                    {% for genre in form.genres %}
+                                        <div class="form-check me-3">
+                                            {{ form_widget(genre, {'attr': {'class': 'form-check-input'}}) }}
+                                            {{ form_label(genre, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100">Sauvegarder</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
