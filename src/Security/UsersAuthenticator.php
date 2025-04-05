@@ -48,9 +48,17 @@ class UsersAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        // For example:
-         return new RedirectResponse($this->urlGenerator->generate('app_home'));
-        throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+        $user = $token->getUser();
+
+        // Redirection en fonction du rôle
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('admin_home'));
+        } elseif (in_array('ROLE_EMPLOYER', $user->getRoles(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('employe_home_index'));
+        }
+
+        // Redirection par défaut si aucun rôle ne correspond
+        return new RedirectResponse($this->urlGenerator->generate('app_home'));
     }
 
     protected function getLoginUrl(Request $request): string

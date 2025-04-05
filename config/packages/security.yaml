@@ -1,56 +1,57 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
-    providers:
-        # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
-            entity:
-                class: App\Entity\User
-                property: email
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            lazy: true
-            provider: app_user_provider
-            custom_authenticator: App\Security\UsersAuthenticator
-            logout:
-                path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
+  # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+  password_hashers:
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
 
-            remember_me:
-                secret: '%kernel.secret%'
-                lifetime: 604800
-                path: /
-                # by default, the feature is enabled by checking a checkbox in the
-                # login form, uncomment the following line to always enable it.
-                #always_remember_me: true
+  # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+  providers:
+    app_user_provider:
+      entity:
+        class: App\Entity\User
+        property: email
+        
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
+    main:
+      lazy: true
+      provider: app_user_provider
+      custom_authenticator: App\Security\UsersAuthenticator
+      logout:
+        path: app_logout
+        target: app_home  # Page d'accueil après déconnexion
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+      remember_me:
+        secret: "%kernel.secret%"
+        lifetime: 604800
+        path: /
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+      # Ajouter l'entry_point pour éviter l'erreur
+      entry_point: App\Security\UsersAuthenticator  # Utiliser ton authentificateur personnalisé ici
+
+      # Si tu utilises form_login, voici la configuration à utiliser à la place du custom_authenticator
+      form_login:
+        login_path: app_login
+        check_path: app_login
+        default_target_path: /redirect  # Redirection après la connexion
+
+  # Contrôle d'accès
+  access_control:
+    - { path: ^/admin/films, roles: [ROLE_ADMIN, ROLE_EMPLOYER] }
+    - { path: ^/admin/seance, roles: [ROLE_ADMIN, ROLE_EMPLOYER] }
+    - { path: ^/admin/salles, roles: [ROLE_ADMIN, ROLE_EMPLOYER] }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/employe, roles: ROLE_EMPLOYER }
 
 when@test:
-    security:
-        password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+  security:
+    password_hashers:
+      # Par défaut, les hashages de mot de passe sont gourmands en ressources et prennent du temps. 
+      # Dans les tests, ce n'est pas nécessaire, donc nous réduisons les coûts au minimum.
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        algorithm: auto
+        cost: 4  # Valeur la plus basse pour bcrypt
+        time_cost: 3  # Valeur la plus basse pour argon
+        memory_cost: 10  # Valeur la plus basse pour argon
