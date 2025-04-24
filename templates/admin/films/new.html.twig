@@ -33,8 +33,13 @@
                             </div>
 
                             <div class="mb-3">
-                                {{ form_label(form.genres, 'Genres', {'label_attr': {'class': 'form-label'}}) }}
+                                <label class="form-label">Genres</label>
                                 {{ form_widget(form.genres, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.imageFile, 'Image du Film', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.imageFile, {'attr': {'class': 'form-control-file'}}) }}
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100">Ajouter</button>

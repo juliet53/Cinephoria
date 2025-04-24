@@ -9,10 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/employe/films', name: 'employe_films_')]
-
 class EmployeFilmController extends AbstractController
 {
     #[Route('', name: 'index')]
@@ -20,7 +18,7 @@ class EmployeFilmController extends AbstractController
     {
         $films = $entityManager->getRepository(Film::class)->findAll();
 
-        return $this->render('admin/films/index.html.twig', [ // Réutilisation des vues admin
+        return $this->render('admin/films/index.html.twig', [
             'films' => $films,
         ]);
     }
@@ -33,6 +31,12 @@ class EmployeFilmController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Gérer l'image uploadée (facultatif si Vich gère tout seul, mais on garde pour cohérence)
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $film->setImageFile($imageFile);
+            }
+
             foreach ($form->get('genres')->getData() as $genre) {
                 $film->addGenre($genre);
             }
@@ -43,7 +47,7 @@ class EmployeFilmController extends AbstractController
             return $this->redirectToRoute('employe_films_index');
         }
 
-        return $this->render('admin/films/new.html.twig', [ 
+        return $this->render('admin/films/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -55,6 +59,13 @@ class EmployeFilmController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Gérer l'image uploadée
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                $film->setImageFile($imageFile);
+            }
+
+            // Mettre à jour les genres
             $film->getGenres()->clear();
             foreach ($form->get('genres')->getData() as $genre) {
                 $film->addGenre($genre);
@@ -65,7 +76,7 @@ class EmployeFilmController extends AbstractController
             return $this->redirectToRoute('employe_films_index');
         }
 
-        return $this->render('admin/films/edit.html.twig', [ // Réutilisation de la vue admin
+        return $this->render('admin/films/edit.html.twig', [
             'form' => $form->createView(),
             'film' => $film,
         ]);

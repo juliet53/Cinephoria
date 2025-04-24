@@ -16,6 +16,27 @@ class FilmRepository extends ServiceEntityRepository
         parent::__construct($registry, Film::class);
     }
 
+    public function findFilmsAddedLastWednesday(): array
+{
+    $today = new \DateTimeImmutable('today');
+    $dayOfWeek = $today->format('w'); 
+
+    $daysToSubtract = ($dayOfWeek >= 3) ? $dayOfWeek - 3 : 7 - (3 - $dayOfWeek);
+    $lastWednesday = $today->modify("-$daysToSubtract days");
+
+    $start = $lastWednesday->setTime(0, 0);
+    $end = $lastWednesday->setTime(23, 59, 59);
+
+    return $this->createQueryBuilder('f')
+        ->andWhere('f.createdAt BETWEEN :start AND :end')
+        ->setParameter('start', $start)
+        ->setParameter('end', $end)
+        ->orderBy('f.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
+
     //    /**
     //     * @return Film[] Returns an array of Film objects
     //     */

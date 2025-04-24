@@ -1,20 +1,39 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
-
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="container mt-4">
+        <h2 class="mb-4">Films ajoutés le dernier mercredi</h2>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/jalil/OneDrive/Documents/STUDI/Projet/Cinephoria/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>C:/Users/jalil/OneDrive/Documents/STUDI/Projet/Cinephoria/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+        {% if films is not empty %}
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for film in films %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if film.imageName %}
+                                <img src="{{ asset('images/Film/' ~ film.imageName) }}" class="card-img-top" alt="{{ film.title }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/300x200?text=Pas+de+visuel" class="card-img-top" alt="placeholder">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ film.title }}</h5>
+                                <p class="card-text">
+                                    {% if film.description|length > 100 %}
+                                        {{ film.description|slice(0, 100) ~ '...' }}
+                                    {% else %}
+                                        {{ film.description }}
+                                    {% endif %}
+                                </p>
+                                <p class="card-text"><small class="text-muted">Réalisé par {{ film.director }}</small></p>
+                            </div>
+                            <div class="card-footer text-muted">
+                                Ajouté le {{ film.createdAt|date('d/m/Y') }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Aucun film ajouté ce mercredi.</p>
+        {% endif %}
+    </div>
 {% endblock %}

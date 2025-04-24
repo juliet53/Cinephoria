@@ -31,11 +31,19 @@ class FilmController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Associer les genres sélectionnés
-            foreach ($form->get('genres')->getData() as $genre) {
-                $film->addGenre($genre);
+            $imageFile = $form->get('imageFile')->getData();
+
+            // Si un fichier est téléchargé
+            if ($imageFile) {
+                // Récupérer les informations du fichier téléchargé
+                $film->setImageName($imageFile->getClientOriginalName());
+                $film->setImageSize($imageFile->getSize());
+
+                // On peut aussi définir l'image avant de persister le film
+                $film->setImageFile($imageFile);
             }
 
+            // Persist le film dans la base de données
             $entityManager->persist($film);
             $entityManager->flush();
 
@@ -54,8 +62,19 @@ class FilmController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Gérer l'image uploadée
+            $imageFile = $form->get('imageFile')->getData();
+            if ($imageFile) {
+                // Récupérer les informations du fichier téléchargé
+                $film->setImageName($imageFile->getClientOriginalName());
+                $film->setImageSize($imageFile->getSize());
+
+                // On peut aussi définir l'image avant de persister le film
+                $film->setImageFile($imageFile);
+            }
+
             // Mettre à jour les genres
-            $film->getGenres()->clear(); // Supprime les anciens genres
+            $film->getGenres()->clear(); // Supprimer les anciens genres
             foreach ($form->get('genres')->getData() as $genre) {
                 $film->addGenre($genre);
             }

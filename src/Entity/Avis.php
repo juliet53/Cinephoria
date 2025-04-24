@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AvisRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AvisRepository::class)]
@@ -21,6 +22,9 @@ class Avis
 
     #[ORM\ManyToOne(inversedBy: 'avis')]
     private ?Film $film = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $Commentaire = null;
 
     public function getId(): ?int
     {
@@ -59,6 +63,18 @@ class Avis
     public function setFilm(?Film $film): static
     {
         $this->film = $film;
+
+        return $this;
+    }
+
+    public function getCommentaire(): ?string
+    {
+        return $this->Commentaire;
+    }
+
+    public function setCommentaire(?string $Commentaire): static
+    {
+        $this->Commentaire = $Commentaire;
 
         return $this;
     }
