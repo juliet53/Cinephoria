@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">Tous les films</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label for="genreFilter" class="form-label">Filtrer par Genre :</label>
+            <select id="genreFilter" class="form-select">
+                <option value="">Tous les genres</option>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}">{{ genre.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="dateFilter" class="form-label">Filtrer par Date de Séance :</label>
+            <select id="dateFilter" class="form-select">
+                <option value="">Toutes les dates</option>
+                {% for seance in seances %}
+                    {% if seance.dateHeureDebut %}
+                        <option value="{{ seance.dateHeureDebut|date('Y-m-d H:i') }}">
+                            {{ seance.dateHeureDebut|date('d/m/Y H:i') }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4" id="films-container">
+        {% for film in films %}
+            <div class="col film-card"
+                data-genres="{% for genre in film.genres %}{{ genre.id }}{% if not loop.last %},{% endif %}{% endfor %}"
+                data-seances="{% for seance in film.seances %}{{ seance.dateHeureDebut|date('Y-m-d H:i') }}{% if not loop.last %},{% endif %}{% endfor %}">
+                
+                <div class="card h-100">
+                    {% if film.imageName %}
+                        <img src="{{ asset('images/Film/' ~ film.imageName) }}" class="card-img-top" alt="{{ film.title }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x200?text=Pas+de+visuel" class="card-img-top" alt="placeholder">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ film.title }}</h5>
+                        <p class="card-text">
+                            {% if film.description|length > 100 %}
+                                {{ film.description|slice(0, 100) ~ '...' }}
+                            {% else %}
+                                {{ film.description }}
+                            {% endif %}
+                        </p>
+                        <p class="card-text"><small class="text-muted">Réalisé par {{ film.director }}</small></p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Ajouté le {{ film.createdAt|date('d/m/Y') }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    const genreFilter = document.getElementById('genreFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const filmsContainer = document.getElementById('films-container');
+    const filmCards = filmsContainer.getElementsByClassName('film-card');
+
+    function applyFilters() {
+        const selectedGenre = genreFilter.value;
+        const selectedDate = dateFilter.value;
+
+        Array.from(filmCards).forEach(card => {
+            const genres = card.dataset.genres ? card.dataset.genres.split(',') : [];
+            const seances = card.dataset.seances ? card.dataset.seances.split(',') : [];
+
+            const matchGenre = !selectedGenre || genres.includes(selectedGenre);
+            const matchDate = !selectedDate || seances.includes(selectedDate);
+
+            if (matchGenre && matchDate) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    genreFilter.addEventListener('change', applyFilters);
+    dateFilter.addEventListener('change', applyFilters);
+</script>
+{% endblock %}
