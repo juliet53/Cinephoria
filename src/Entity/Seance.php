@@ -100,6 +100,14 @@ class Seance
 
         return $this;
     }
+    public function reserverPlaces(int $placesReservees): bool
+    {
+        if ($this->placeDisponible >= $placesReservees) {
+            $this->placeDisponible -= $placesReservees;
+            return true;  // Réservation réussie
+        }
+        return false;  // Pas assez de places disponibles
+    }
 
     public function getFilm(): ?Film
     {

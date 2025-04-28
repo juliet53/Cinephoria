@@ -25,6 +25,9 @@ class Reservation
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     private ?Seance $seance = null;
 
+    #[ORM\Column(type: 'json', nullable: true)] 
+    private ?array $seats = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,17 @@ class Reservation
     {
         $this->seance = $seance;
 
+        return $this;
+    }
+
+    public function getSeats(): ?array
+    {
+        return $this->seats;
+    }
+
+    public function setSeats(?array $seats): static
+    {
+        $this->seats = $seats;
         return $this;
     }
 }

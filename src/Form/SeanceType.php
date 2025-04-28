@@ -39,7 +39,10 @@ class SeanceType extends AbstractType
             ])
             ->add('salle', EntityType::class, [
                 'class' => Salle::class,
-                'choice_label' => 'numero',
+                'choice_label' => function (Salle $salle) {
+                    return $salle->getNumero() . ' - ' . ($salle->getCinema() ? $salle->getCinema()->getNom() : 'Pas de cinéma');
+                },
+                'placeholder' => 'Choisir une salle',
             ])
             ->add('prix', NumberType::class, [
                 'label' => 'Prix',

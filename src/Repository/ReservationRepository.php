@@ -15,6 +15,23 @@ class ReservationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Reservation::class);
     }
+    public function findReservedSeatsBySeance(int $seanceId): array
+    {
+        $reservations = $this->createQueryBuilder('r')
+            ->select('r.seats')
+            ->where('r.seance = :seanceId')
+            ->setParameter('seanceId', $seanceId)
+            ->getQuery()
+            ->getResult();
+
+        // Aplatir le tableau de sièges
+        $reservedSeats = [];
+        foreach ($reservations as $reservation) {
+            $reservedSeats = array_merge($reservedSeats, $reservation['seats']);
+        }
+
+        return array_unique($reservedSeats);
+    }
 
     //    /**
     //     * @return Reservation[] Returns an array of Reservation objects

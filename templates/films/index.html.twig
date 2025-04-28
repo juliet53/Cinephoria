@@ -5,7 +5,7 @@
     <h2 class="mb-4">Tous les films</h2>
 
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="genreFilter" class="form-label">Filtrer par Genre :</label>
             <select id="genreFilter" class="form-select">
                 <option value="">Tous les genres</option>
@@ -15,7 +15,7 @@
             </select>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="dateFilter" class="form-label">Filtrer par Date de Séance :</label>
             <select id="dateFilter" class="form-select">
                 <option value="">Toutes les dates</option>
@@ -28,13 +28,24 @@
                 {% endfor %}
             </select>
         </div>
+
+        <div class="col-md-4">
+            <label for="cinemaFilter" class="form-label">Filtrer par Cinéma :</label>
+            <select id="cinemaFilter" class="form-select">
+                <option value="">Tous les cinémas</option>
+                {% for cinema in cinemas %}
+                    <option value="{{ cinema.id }}">{{ cinema.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
 
     <div class="row row-cols-1 row-cols-md-3 g-4" id="films-container">
         {% for film in films %}
             <div class="col film-card"
                 data-genres="{% for genre in film.genres %}{{ genre.id }}{% if not loop.last %},{% endif %}{% endfor %}"
-                data-seances="{% for seance in film.seances %}{{ seance.dateHeureDebut|date('Y-m-d H:i') }}{% if not loop.last %},{% endif %}{% endfor %}">
+                data-seances="{% for seance in film.seances %}{{ seance.dateHeureDebut|date('Y-m-d H:i') }}{% if not loop.last %},{% endif %}{% endfor %}"
+                data-cinemas="{% for seance in film.seances %}{% if seance.salle and seance.salle.cinema %}{{ seance.salle.cinema.id }}{% if not loop.last %},{% endif %}{% endif %}{% endfor %}">
                 
                 <div class="card h-100">
                     {% if film.imageName %}
@@ -53,6 +64,9 @@
                         </p>
                         <p class="card-text"><small class="text-muted">Réalisé par {{ film.director }}</small></p>
                     </div>
+                    <div class="card-body">
+                        <a href="{{ path('app_film_show', {'id': film.id}) }}" class="btn btn-outline-secondary">Voir plus</a>
+                    </div>
                     <div class="card-footer text-muted">
                         Ajouté le {{ film.createdAt|date('d/m/Y') }}
                     </div>
@@ -65,21 +79,25 @@
 <script>
     const genreFilter = document.getElementById('genreFilter');
     const dateFilter = document.getElementById('dateFilter');
+    const cinemaFilter = document.getElementById('cinemaFilter');
     const filmsContainer = document.getElementById('films-container');
     const filmCards = filmsContainer.getElementsByClassName('film-card');
 
     function applyFilters() {
         const selectedGenre = genreFilter.value;
         const selectedDate = dateFilter.value;
+        const selectedCinema = cinemaFilter.value;
 
         Array.from(filmCards).forEach(card => {
             const genres = card.dataset.genres ? card.dataset.genres.split(',') : [];
             const seances = card.dataset.seances ? card.dataset.seances.split(',') : [];
+            const cinemas = card.dataset.cinemas ? card.dataset.cinemas.split(',') : [];
 
             const matchGenre = !selectedGenre || genres.includes(selectedGenre);
             const matchDate = !selectedDate || seances.includes(selectedDate);
+            const matchCinema = !selectedCinema || cinemas.includes(selectedCinema);
 
-            if (matchGenre && matchDate) {
+            if (matchGenre && matchDate && matchCinema) {
                 card.style.display = 'block';
             } else {
                 card.style.display = 'none';
@@ -89,5 +107,6 @@
 
     genreFilter.addEventListener('change', applyFilters);
     dateFilter.addEventListener('change', applyFilters);
+    cinemaFilter.addEventListener('change', applyFilters);
 </script>
 {% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Réservations{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1>Mes Réservations</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+
+        {% if reservations is empty %}
+            <p class="text-center">Vous n'avez aucune réservation en cours.</p>
+        {% else %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Film</th>
+                        <th>Date et Heure</th>
+                        <th>Nombre de places</th>
+                        <th>Places réservées</th>
+                        <th>Prix total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <td>{{ reservation.id }}</td>
+                            <td>{{ reservation.seance.film.title }}</td>
+                            <td>{{ reservation.seance.dateHeureDebut|date('d/m/Y H:i') }}</td>
+                            <td>{{ reservation.placeReserve }}</td>
+                            <td>{{ reservation.seats|join(', ') }}</td>
+                            <td>{{ reservation.prix }} €</td>
+                            <td>
+                                <a href="{{ path('app_user_reservation_detail', {'id': reservation.id}) }}" class="btn btn-sm btn-primary">Voir détails</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <a href="{{ path('app_reservation') }}" class="btn btn-secondary mt-3">Retour à la réservation</a>
+    </div>
+{% endblock %}

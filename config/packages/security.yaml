@@ -9,7 +9,7 @@ security:
       entity:
         class: App\Entity\User
         property: email
-        
+
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -21,7 +21,7 @@ security:
       custom_authenticator: App\Security\UsersAuthenticator
       logout:
         path: app_logout
-        target: app_home  # Page d'accueil après déconnexion
+        target: app_home # Page d'accueil après déconnexion
 
       remember_me:
         secret: "%kernel.secret%"
@@ -29,13 +29,13 @@ security:
         path: /
 
       # Ajouter l'entry_point pour éviter l'erreur
-      entry_point: App\Security\UsersAuthenticator  # Utiliser ton authentificateur personnalisé ici
+      entry_point: App\Security\UsersAuthenticator # Utiliser ton authentificateur personnalisé ici
 
       # Si tu utilises form_login, voici la configuration à utiliser à la place du custom_authenticator
       form_login:
         login_path: app_login
         check_path: app_login
-        default_target_path: /redirect  # Redirection après la connexion
+        default_target_path: /redirect # Redirection après la connexion
 
   # Contrôle d'accès
   access_control:
@@ -44,14 +44,15 @@ security:
     - { path: ^/admin/salles, roles: [ROLE_ADMIN, ROLE_EMPLOYER] }
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/employe, roles: ROLE_EMPLOYER }
+    - { path: ^/reservation, roles: ROLE_USER }
 
 when@test:
   security:
     password_hashers:
-      # Par défaut, les hashages de mot de passe sont gourmands en ressources et prennent du temps. 
+      # Par défaut, les hashages de mot de passe sont gourmands en ressources et prennent du temps.
       # Dans les tests, ce n'est pas nécessaire, donc nous réduisons les coûts au minimum.
       Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
         algorithm: auto
-        cost: 4  # Valeur la plus basse pour bcrypt
-        time_cost: 3  # Valeur la plus basse pour argon
-        memory_cost: 10  # Valeur la plus basse pour argon
+        cost: 4 # Valeur la plus basse pour bcrypt
+        time_cost: 3 # Valeur la plus basse pour argon
+        memory_cost: 10 # Valeur la plus basse pour argon
