@@ -3,100 +3,110 @@
 {% block title %}Réservation{% endblock %}
 
 {% block body %}
-    <h1>Réservation de Séance</h1>
+    <div class="container mt-5 bg-light p-4 rounded shadow" style="max-width: 1200px;">
+        <h1 class="text-center mb-4">Réservation de Séance</h1>
 
-    <!-- Bouton "Voir mes réservations" -->
-    {% if app.user %}
-        <div style="float: left; margin-bottom: 20px;">
-            <a href="{{ path('app_user_reservations') }}" class="btn btn-primary">Voir mes réservations</a>
-        </div>
-    {% endif %}
-
-    <!-- Section pour les filtres -->
-    <div class="mb-4" style="clear: both;">
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="filmFilter" class="form-label">Filtrer par film</label>
-                <select id="filmFilter" class="form-select" onchange="filterSeances()">
-                    <option value="">Tous les films</option>
-                    {% for seance in seances %}
-                        <option value="{{ seance.film.title }}">{{ seance.film.title }}</option>
-                    {% endfor %}
-                </select>
+        <!-- Bouton "Voir mes réservations" -->
+        {% if app.user %}
+            <div class="mb-4">
+                <a href="{{ path('app_user_reservations') }}" class="btn btn-primary">Voir mes réservations</a>
             </div>
+        {% endif %}
 
-            <div class="col-md-6 mb-3">
-                <label for="dateFilter" class="form-label">Filtrer par date</label>
-                <select id="dateFilter" class="form-select" onchange="filterSeances()">
-                    <option value="">Toutes les dates</option>
-                    {% set dates = [] %}
-                    {% for seance in seances %}
-                        {% set date = seance.dateHeureDebut|date('Y-m-d') %}
-                        {% if date not in dates %}
-                            {% set dates = dates | merge([date]) %}
-                            <option value="{{ date }}">{{ seance.dateHeureDebut|date('d/m/Y H:i') }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Section des séances disponibles -->
-    {{ form_start(form, {'attr': {'id': 'reservationForm'}}) }}
-    <div class="row mb-3">
-        <div class="col-md-6">
-            {{ form_row(form.numPersons, {'attr': {'onchange': 'enableSeanceSelection()'}}) }}
-        </div>
-    </div>
-
-    <div class="row" id="seancesContainer">
-        {% for seance in seances %}
-            <div class="col-md-4 mb-4 seance-card disabled" 
-                 data-id="{{ seance.id }}" 
-                 data-film="{{ seance.film.title }}" 
-                 data-date="{{ seance.dateHeureDebut|date('Y-m-d') }}" 
-                 data-places="{{ seance.getPlaceDisponible() }}"
-                 data-reserved-seats="{{ reservedSeatsBySeance[seance.id]|json_encode|e('html_attr') }}"
-                 onclick="toggleSelection(this)">
-                <div class="card" style="cursor: pointer;">
-                    <div class="card-header">{{ seance.salle.cinema.ville }}</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ seance.film.title }}</h5>
-                        <p class="card-text">
-                            <strong>Date :</strong>
-                            {{ seance.dateHeureDebut|date('d/m/Y H:i') }}<br>
-                            <strong>Qualité :</strong>
-                            {{ seance.qualite }}<br>
-                            <strong>Places disponibles :</strong>
-                            <span class="places-available">{{ seance.getPlaceDisponible() }}</span>
-                        </p>
-                    </div>
+        <!-- Section pour les filtres -->
+        <div class="mb-4">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="filmFilter" class="form-label">Filtrer par film</label>
+                    <select id="filmFilter" class="form-select" onchange="filterSeances()">
+                        <option value="">Tous les films</option>
+                        {% set seance_films = [] %}
+                        {% for seance in seances %}
+                            {% if seance.film.title not in seance_films %}
+                                {% set seance_films = seance_films|merge([seance.film.title]) %}
+                                <option value="{{ seance.film.title }}"
+                                        {% if seance.film.title == filmFilter %}selected{% endif %}>
+                                    {{ seance.film.title }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="dateFilter" class="form-label">Filtrer par date</label>
+                    <select id="dateFilter" class="form-select" onchange="filterSeances()">
+                        <option value="">Toutes les dates</option>
+                        {% set dates = [] %}
+                        {% for seance in seances %}
+                            {% set date = seance.dateHeureDebut|date('Y-m-d') %}
+                            {% if date not in dates %}
+                                {% set dates = dates | merge([date]) %}
+                                <option value="{{ date }}"
+                                        {% if date == dateFilter %}selected{% endif %}>
+                                    {{ seance.dateHeureDebut|date('d/m/Y') }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
-        {% else %}
-            <div class="col-12 text-center">
-                <p>Aucune séance disponible</p>
+        </div>
+
+        <!-- Section des séances disponibles -->
+        {{ form_start(form, {'attr': {'id': 'reservationForm', }}) }}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form_row(form.numPersons, {'label': 'Nombre de personnes','attr': {'class': 'form-control', 'onchange': 'enableSeanceSelection()'}}) }}
             </div>
-        {% endfor %}
+        </div>
+
+        <div class="row" id="seancesContainer">
+            {% for seance in seances %}
+                <div class="col-md-4 mb-4 seance-card disabled"
+                     data-id="{{ seance.id }}"
+                     data-film="{{ seance.film.title }}"
+                     data-date="{{ seance.dateHeureDebut|date('Y-m-d') }}"
+                     data-places="{{ seance.getPlaceDisponible() }}"
+                     data-reserved-seats="{{ reservedSeatsBySeance[seance.id]|json_encode|e('html_attr') }}"
+                     onclick="toggleSelection(this)">
+                    <div class="card h-100 shadow-sm" style="cursor: pointer;">
+                        <div class="card-header bg-primary text-white">{{ seance.salle.cinema.ville }}</div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ seance.film.title }}</h5>
+                            <p class="card-text">
+                                <strong>Date :</strong> {{ seance.dateHeureDebut|date('d/m/Y H:i') }}<br>
+                                <strong>Qualité :</strong> {{ seance.qualite }}<br>
+                                <strong>Places non réservées :</strong>
+                                <span class="places-available badge bg-success">{{ seance.getPlaceDisponible() }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center">
+                    <p class="alert alert-warning">Aucune séance disponible</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Champs cachés  -->
+        {{ form_row(form.seance, {'attr': {'id': 'reservation_seance', 'class': 'd-none'}}) }}
+        {{ form_row(form.seats, {'attr': {'id': 'reservation_seats', 'class': 'd-none'}}) }}
+
+        <div class="mt-4 text-center">
+            <h4>Places non réservées pour la séance sélectionnée :
+                <span id="placesAvailableDisplay">0</span>
+            </h4>
+        </div>
+
+        <div id="seatSelection" class="mt-4 text-center"></div>
+
+        <div class="text-center mt-4">
+            <button type="submit" id="reserve_button" class="btn btn-primary btn-lg" style="display: none;">Réserver</button>
+        </div>
+
+        {{ form_end(form) }}
     </div>
-
-    <!-- Champs cachés Symfony -->
-    {{ form_row(form.seance, {'attr': {'id': 'reservation_seance'}}) }}
-    {{ form_row(form.seats, {'attr': {'id': 'reservation_seats'}}) }}
-
-    <div class="text-center">
-        <button type="submit" id="reserve_button" class="btn btn-primary" style="display: none;">Réserver</button>
-    </div>
-    {{ form_end(form) }}
-
-    <div class="mt-4 text-center">
-        <h4>Nombre de places disponibles pour la séance sélectionnée :
-            <span id="placesAvailableDisplay">0</span>
-        </h4>
-    </div>
-
-    <div id="seatSelection" class="mt-4 text-center"></div>
 {% endblock %}
 
 {% block javascripts %}
@@ -126,6 +136,12 @@
                 return;
             }
 
+            const placesAvailable = parseInt(card.getAttribute('data-places')) || 0;
+            if (placesAvailable <= 0) {
+                alert("Aucune place disponible pour cette séance.");
+                return;
+            }
+
             // Vérifier si l'élément reservation_seance existe
             const selectedSeancesInput = document.getElementById('reservation_seance');
             if (!selectedSeancesInput) {
@@ -139,7 +155,6 @@
             card.querySelector('.card').classList.add('selected');
 
             const seanceId = card.getAttribute('data-id');
-            const placesAvailable = parseInt(card.getAttribute('data-places')) || 0;
             const reservedSeats = JSON.parse(card.getAttribute('data-reserved-seats') || '[]');
 
             // Définir la valeur pour l'input hidden
@@ -153,15 +168,17 @@
         function updatePlacesAvailable(places, reservedSeats) {
             const display = document.getElementById('placesAvailableDisplay');
             const seatSelection = document.getElementById('seatSelection');
+            const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
 
-            display.textContent = `Places disponibles : ${places}`;
+            display.textContent = places;
             seatSelection.innerHTML = '';
 
-            if (places > 0) {
+            if (places > 0 && places >= numPersons) {
                 const seatsPerRow = 8;
                 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                const totalSeats = places + reservedSeats.length;
 
-                for (let i = 0; i < places; i++) {
+                for (let i = 0; i < totalSeats; i++) {
                     const row = Math.floor(i / seatsPerRow);
                     const col = (i % seatsPerRow) + 1;
                     const seatLabel = alphabet[row] + col;
@@ -179,7 +196,7 @@
                     seat.style.width = '20px';
                     seat.style.height = '20px';
 
-                    // Si la place est réservée, la mettre en rouge et la désactiver
+                    // Si la place est réservée, la désactiver et la mettre en rouge
                     if (reservedSeats.includes(seatLabel)) {
                         seat.disabled = true;
                         seat.style.backgroundColor = 'red';
@@ -202,7 +219,7 @@
                 }
                 addSeatSelectionLimit();
             } else {
-                seatSelection.innerHTML = '<p>Aucune place disponible</p>';
+                seatSelection.innerHTML = '<p>Aucune place disponible ou nombre de personnes trop élevé.</p>';
             }
         }
 
@@ -242,7 +259,6 @@
                 const selectedSeatsArray = Array.from(selectedSeats).map(cb => cb.value);
                 seatsHiddenField.value = JSON.stringify(selectedSeatsArray);
 
-                // Débogage : Afficher les données envoyées
                 console.log("Données envoyées:", {
                     seance: document.getElementById('reservation_seance').value,
                     seats: seatsHiddenField.value,
@@ -250,7 +266,9 @@
                 });
             });
 
-            // Débogage : Vérifier si reservation_seance existe au chargement
+            // Appliquer les filtres au chargement
+            filterSeances();
+
             console.log("reservation_seance au chargement:", document.getElementById('reservation_seance'));
         });
 

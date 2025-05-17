@@ -1,18 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord de l'Admin{% endblock %}
+{% block title %}Tableau de bord de l'Admin
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        <h1>Tableau de bord de l'Administrateur</h1>
+	<div class="container mt-5">
+		<h1>Tableau de bord de l'Administrateur</h1>
 
-        <div class="list-group mt-4">
-            <a href="{{ path('admin_films_index') }}" class="list-group-item list-group-item-action">Gestion des Films</a>
-            <a href="{{ path('admin_seance_index') }}" class="list-group-item list-group-item-action">Gestion des Séances</a>
-            <a href="{{ path('admin_salles_index') }}" class="list-group-item list-group-item-action">Gestion des Salles</a>
-            <a href="{{ path('admin_users') }}" class="list-group-item list-group-item-action">Gestion des Utilisateurs</a>
-            <a href="{{ path('admin_genre_index') }}" class="list-group-item list-group-item-action">Gestion des Genres</a>
-            <a href="{{ path('admin_cinema_index') }}" class="list-group-item list-group-item-action">Gestion des Cinémas</a>
-        </div>
-    </div>
+		<div class="list-group mt-4">
+			<a href="{{ path('admin_films_index') }}" class="list-group-item list-group-item-action">Gestion des Films</a>
+			<a href="{{ path('admin_seance_index') }}" class="list-group-item list-group-item-action">Gestion des Séances</a>
+			<a href="{{ path('admin_salles_index') }}" class="list-group-item list-group-item-action">Gestion des Salles</a>
+			<a href="{{ path('admin_users') }}" class="list-group-item list-group-item-action">Gestion des Utilisateurs</a>
+			<a href="{{ path('admin_genre_index') }}" class="list-group-item list-group-item-action">Gestion des Genres</a>
+			<a href="{{ path('admin_cinema_index') }}" class="list-group-item list-group-item-action">Gestion des Cinémas</a>
+			<a href="{{ path('app_admin_avis') }}" class="list-group-item list-group-item-action">Gestion des Avis</a>
+		</div>
+	</div>
 {% endblock %}

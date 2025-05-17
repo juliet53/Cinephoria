@@ -17,25 +17,31 @@
 				{% endif %}
 			</div>
 			<div class="col-md-6">
-                                <h1>{{ film.title }}</h1>
+				<h1 class="mb-3 ">{{ film.title }}</h1>
+
 				<p>
-					<strong>Description:</strong>
-					{{ film.description }}</p>
+					<span class="fw-bold">Description :</span><br>
+					{{ film.description }}
+				</p>
+
 				<p>
-					<strong>Réalisateur:</strong>
-					{{ film.director }}</p>
+					<span class="fw-bold">Réalisateur :</span><br>
+					{{ film.director }}
+				</p>
+
 				<p>
-					<strong>Genres:</strong>
+					<span class="fw-bold">Genres :</span><br>
 					{% for genre in film.genres %}
-						{{ genre.nom }}
-						{% if not loop.last %},
-						{% endif %}
+					<span class="badge bg-secondary me-1">{{ genre.nom }}</span>
 					{% endfor %}
 				</p>
+
 				<p>
-					<strong>Date de Création:</strong>
-					{{ film.createdAt|date('d/m/Y') }}</p>
+					<span class="fw-bold">Date de Création :</span><br>
+					{{ film.createdAt|date('d/m/Y') }}
+				</p>
 			</div>
+
 		</div>
 
 		<h2 class="mt-5 mb-4">Séances Disponibles</h2>
@@ -43,7 +49,7 @@
 			{% for seance in film.seances %}
 				<div
 					class="col-md-4 mb-4">
-					<!-- Carte pour chaque séance -->
+					<!-- Pour les séances -->
 					<div class="card">
 						<div class="card-header">
 							Séance le
@@ -68,10 +74,8 @@
 								<strong>Prix:</strong>
 								{{ seance.prix }}
 								€</p>
-							<!-- Bouton pour voir les détails de la séance (ou réserver si nécessaire) -->
-							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#seanceModal{{ seance.id }}">
-								Voir Détails
-							</button>
+
+							<a href="{{ path('app_reservation', { 'seanceId': seance.id, 'film': film.title, 'date': seance.dateHeureDebut|date('Y-m-d') }) }}" class="btn btn-primary">Réserver</a>
 						</div>
 					</div>
 				</div>
@@ -80,6 +84,44 @@
 			{% endfor %}
 		</div>
 
+		{% if is_granted('ROLE_USER') %}
+			<h2 class="mt-5 mb-4">Laisser un avis</h2>
+			<div class="row">
+				<div class="col-md-4">
+				{{ form_start(form) }}
+					{{ form_row(form.Commentaire, {'label': 'Votre commentaire', 'attr': {'class': 'form-control'}}) }}
+					{{ form_row(form.Note, {'label': 'Note (sur 5)', 'attr': {'class': 'form-control'}}) }}
+					<button type="submit" class="btn btn-primary mt-3">Envoyer</button>
+				{{ form_end(form) }}
+				</div>
+            		</div>
+		{% else %}
+			<p class="mt-5">Veuillez vous
+				<a href="{{ path('app_login') }}">connecter</a>
+				pour laisser un avis.</p>
+		{% endif %}
 
+		<h2 class="mt-5 mb-4">Derniers avis</h2>
+		<div class="row">
+			{% if avisValides is not empty %}
+				{% for avis in avisValides %}
+					<div class="col-md-4 mb-4">
+						<div class="card">
+							<div class="card-body">
+								<h5 class="card-title">{{ avis.user.email }}</h5>
+								<p class="card-text">
+									<strong>Note:</strong>
+									{{ avis.Note }}/5</p>
+								<p class="card-text">{{ avis.Commentaire }}</p>
+							</div>
+						</div>
+					</div>
+				{% endfor %}
+			{% else %}
+				<p>Aucun avis pour ce film pour le moment.</p>
+			{% endif %}
+		</div>
 	</div>
-{% endblock %}
+
+
+</div>{% endblock %}

@@ -26,6 +26,9 @@ class Avis
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Commentaire = null;
 
+    #[ORM\Column]
+    private ?bool $valide = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +78,18 @@ class Avis
     public function setCommentaire(?string $Commentaire): static
     {
         $this->Commentaire = $Commentaire;
+
+        return $this;
+    }
+
+    public function isValide(): ?bool
+    {
+        return $this->valide;
+    }
+
+    public function setValide(bool $valide): static
+    {
+        $this->valide = $valide;
 
         return $this;
     }

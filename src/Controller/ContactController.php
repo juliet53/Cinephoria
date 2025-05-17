@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller;
 
 use App\Form\ContactType;
@@ -16,11 +15,10 @@ class ContactController extends AbstractController
     public function index(Request $request, MailerInterface $mailer): Response
     {
         $form = $this->createForm(ContactType::class);
-
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            
 
             $adresse = strip_tags($data['email']);
             $description = strip_tags($data['description']);
@@ -32,13 +30,19 @@ class ContactController extends AbstractController
                 ->subject($description)
                 ->text($content);
 
+            try {
+                $mailer->send($email);
+                $this->addFlash('success', 'Votre message a été envoyé avec succès !');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi du message.');
+            }
 
-            $mailer->send($email);
+            // Rediriger vers la page de contact pour vider les champs
+            return $this->redirectToRoute('app_contact');
         }
 
         return $this->render('contact/index.html.twig', [
-            'controller_name' => 'ContactController',
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 }

@@ -1,7 +1,10 @@
 body {
-    background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
 }
 .selected {
-    border: 2px solid #007bff; /* Bordure bleue */
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); /* Ombre légère */
+  border: 2px solid #007bff; 
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5); 
+}
+.card {
+  background-color: #bbd5db;
 }

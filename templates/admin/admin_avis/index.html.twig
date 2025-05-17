@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration des avis{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Gestion des avis</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% if avis is not empty %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Commentaire</th>
+                        <th>Validé</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for avisItem in avis %}
+                        <tr>
+                            <td>{{ avisItem.user.email }}</td>
+                            <td>{{ avisItem.Commentaire }}</td>
+                            <td>{{ avisItem.valide ? 'Oui' : 'Non' }}</td>
+                            <td>
+                                {% if avisItem.valide %}
+                                    <a href="{{ path('app_admin_avis_invalider', {'id': avisItem.id}) }}" class="btn btn-warning btn-sm" onclick="return confirm('Voulez-vous invalider cet avis ?');">Invalider</a>
+                                {% else %}
+                                    <a href="{{ path('app_admin_avis_valider', {'id': avisItem.id}) }}" class="btn btn-success btn-sm" onclick="return confirm('Voulez-vous valider cet avis ?');">Valider</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Aucun avis à afficher.</p>
+        {% endif %}
+    </div>
+{% endblock %}

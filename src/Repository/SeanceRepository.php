@@ -15,6 +15,29 @@ class SeanceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Seance::class);
     }
+    public function findByFilters(?string $filmTitle, ?string $date): array
+    {
+        $qb = $this->createQueryBuilder('s')
+            ->join('s.film', 'f');
+
+        if ($filmTitle) {
+            $qb->andWhere('f.title = :filmTitle')
+               ->setParameter('filmTitle', $filmTitle);
+        }
+
+        if ($date) {
+            // Filtrer par plage de dates (début à fin de journée)
+            $startDate = new \DateTime($date);
+            $endDate = (clone $startDate)->modify('+1 day');
+
+            $qb->andWhere('s.dateHeureDebut >= :startDate')
+               ->andWhere('s.dateHeureDebut < :endDate')
+               ->setParameter('startDate', $startDate)
+               ->setParameter('endDate', $endDate);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 
     //    /**
     //     * @return Seance[] Returns an array of Seance objects

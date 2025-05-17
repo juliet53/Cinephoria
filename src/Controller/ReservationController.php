@@ -22,9 +22,19 @@ class ReservationController extends AbstractController
         EntityManagerInterface $entityManager,
         Security $security
     ): Response {
-        $seances = $seanceRepository->findAll();
-        $reservation = new Reservation();
-        $form = $this->createForm(ReservationType::class, $reservation);
+        // Récupérer les paramètres de l'URL
+        $filmFilter = $request->query->get('film', '');
+        $dateFilter = $request->query->get('date', '');
+
+        // Récupérer les séances
+        if ($filmFilter || $dateFilter) {
+            $seances = $seanceRepository->findByFilters(
+                $filmFilter ? urldecode($filmFilter) : null,
+                $dateFilter ? $dateFilter : null
+            );
+        } else {
+            $seances = $seanceRepository->findAll();
+        }
 
         // Récupérer les places réservées pour chaque séance
         $reservedSeatsBySeance = [];
@@ -40,6 +50,9 @@ class ReservationController extends AbstractController
             $reservedSeatsBySeance[$seance->getId()] = array_unique($reservedSeats);
         }
 
+        $reservation = new Reservation();
+        $form = $this->createForm(ReservationType::class, $reservation);
+
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             // Débogage : inspecter les données soumises et les erreurs
@@ -51,7 +64,7 @@ class ReservationController extends AbstractController
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $seance = $form->get('seance')->getData(); // Récupère l'entité Seance
+            $seance = $form->get('seance')->getData();
             $selectedSeatsJson = $form->get('seats')->getData();
             $numPersons = $form->get('numPersons')->getData();
 
@@ -119,6 +132,8 @@ class ReservationController extends AbstractController
             'form' => $form->createView(),
             'seances' => $seances,
             'reservedSeatsBySeance' => $reservedSeatsBySeance,
+            'filmFilter' => $filmFilter,
+            'dateFilter' => $dateFilter,
         ]);
     }
 }
