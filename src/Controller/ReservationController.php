@@ -1,10 +1,13 @@
 <?php
 namespace App\Controller;
 
+use App\Document\MongoReservation;
 use App\Entity\Reservation;
 use App\Form\ReservationType;
 use App\Repository\SeanceRepository;
 use App\Repository\ReservationRepository;
+use DateTime;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -20,6 +23,7 @@ class ReservationController extends AbstractController
         SeanceRepository $seanceRepository,
         ReservationRepository $reservationRepository,
         EntityManagerInterface $entityManager,
+        DocumentManager $documentManager,
         Security $security
     ): Response {
         // Récupérer les paramètres de l'URL
@@ -119,7 +123,31 @@ class ReservationController extends AbstractController
             // Mettre à jour les places disponibles
             $seance->reserverPlaces($placeReserve);
 
-            // Persister les données
+            // Enregistrer dans MongoDB
+            try {
+                $mongoReservation = new MongoReservation();
+                $film = $seance->getFilm();
+                if ($film && method_exists($film, 'getId')) {
+                    $filmId = (string) $film->getId();
+                    $mongoReservation->setFilmId($filmId);
+                } else {
+                    $this->addFlash('warning', 'ID du film non trouvé, enregistrement MongoDB ignoré.');
+                    dump('Film error:', $film, method_exists($film, 'getId'));
+                    throw new \Exception('ID du film non trouvé.');
+                }
+                $mongoReservation->setReservationDate(new DateTime());
+                $mongoReservation->setNumberOfTickets($placeReserve);
+                $mongoReservation->setTotalPrice($prixTotal);
+                dump('MongoReservation:', $mongoReservation);
+                $documentManager->persist($mongoReservation);
+                $documentManager->flush();
+                dump('MongoDB save successful for filmId:', $filmId);
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Échec de l\'enregistrement dans MongoDB : ' . $e->getMessage());
+                dump('MongoDB error:', $e->getMessage());
+            }
+
+            // Persister les données dans SQL
             $entityManager->persist($reservation);
             $entityManager->persist($seance);
             $entityManager->flush();
