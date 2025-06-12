@@ -27,12 +27,12 @@
                         <td class="text-uppercase font-weight-bold">{{ user.roles[0] }}</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <a href="{{ path('admin_user_edit', { id: user.id }) }}" class="btn btn-warning btn-sm">
-                                    <i class="bi bi-pencil-square"></i> Modifier
+                                <a href="{{ path('admin_user_edit', { id: user.id }) }}" class="btn btn-primary btn-sm">
+                                    Modifier
                                 </a>
                                 <form action="{{ path('admin_user_delete', { id: user.id }) }}" method="post" style="display:inline;">
                                     <button class="btn btn-danger btn-sm" type="submit">
-                                        <i class="bi bi-trash"></i> Supprimer
+                                         Supprimer
                                     </button>
                                 </form>
                             </div>

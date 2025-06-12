@@ -9,7 +9,7 @@
             <a href="{{ path('admin_salles_new') }}" class="btn btn-success">Ajouter une Salle</a>
         </div>
         <table class="table table-bordered table-striped mt-3">
-            <thead class="table-dark">
+            <thead>
                 <tr>
                     <th>#</th>
                     <th>Numéro</th>
@@ -26,7 +26,7 @@
                         <td>{{ salle.capacite }}</td>
                         <td>{{ salle.cinema.ville ?? 'Non défini' }}</td> <!-- Affichage du cinéma associé -->
                         <td>
-                            <a href="{{ path('admin_salles_edit', {'id': salle.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                            <a href="{{ path('admin_salles_edit', {'id': salle.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
                             <form action="{{ path('admin_salles_delete', {'id': salle.id}) }}" method="post" class="d-inline"
                                   onsubmit="return confirm('Voulez-vous vraiment supprimer cette salle ?');">
                                 <input type="hidden" name="_method" value="DELETE">

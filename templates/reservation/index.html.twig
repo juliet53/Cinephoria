@@ -1,295 +1,300 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réservation{% endblock %}
+{% block title %}Réservation
+{% endblock %}
 
 {% block body %}
-    <div class="container mt-5 bg-light p-4 rounded shadow" style="max-width: 1200px;">
-        <h1 class="text-center mb-4">Réservation de Séance</h1>
+	<div class="container mt-5 bg-light p-4 rounded shadow" style="max-width: 1200px;">
+		<h1 class="text-center mb-4">Réservation de Séance</h1>
 
-        <!-- Bouton "Voir mes réservations" -->
-        {% if app.user %}
-            <div class="mb-4">
-                <a href="{{ path('app_user_reservations') }}" class="btn btn-primary">Voir mes réservations</a>
-            </div>
-        {% endif %}
+		<!-- Bouton "Voir mes réservations" -->
+		{% if app.user %}
+			<div class="mb-4">
+				<a href="{{ path('app_user_reservations') }}" class="btn btn-primary">Voir mes réservations</a>
+			</div>
+		{% endif %}
 
-        <!-- Section pour les filtres -->
-        <div class="mb-4">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="filmFilter" class="form-label">Filtrer par film</label>
-                    <select id="filmFilter" class="form-select" onchange="filterSeances()">
-                        <option value="">Tous les films</option>
-                        {% set seance_films = [] %}
-                        {% for seance in seances %}
-                            {% if seance.film.title not in seance_films %}
-                                {% set seance_films = seance_films|merge([seance.film.title]) %}
-                                <option value="{{ seance.film.title }}"
-                                        {% if seance.film.title == filmFilter %}selected{% endif %}>
-                                    {{ seance.film.title }}
-                                </option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="dateFilter" class="form-label">Filtrer par date</label>
-                    <select id="dateFilter" class="form-select" onchange="filterSeances()">
-                        <option value="">Toutes les dates</option>
-                        {% set dates = [] %}
-                        {% for seance in seances %}
-                            {% set date = seance.dateHeureDebut|date('Y-m-d') %}
-                            {% if date not in dates %}
-                                {% set dates = dates | merge([date]) %}
-                                <option value="{{ date }}"
-                                        {% if date == dateFilter %}selected{% endif %}>
-                                    {{ seance.dateHeureDebut|date('d/m/Y') }}
-                                </option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        </div>
+		<!-- Section pour les filtres -->
+		<div class="mb-4">
+			<div class="row">
+				<div class="col-md-6 mb-3">
+					<label for="filmFilter" class="form-label">Filtrer par film</label>
+					<select id="filmFilter" class="form-select" onchange="updateSeanceDisplay()">
+						<option value="">Tous les films</option>
+						{% set seance_films = [] %}
+						{% for seance in seances %}
+							{% if seance.film.title not in seance_films %}
+								{% set seance_films = seance_films|merge([seance.film.title]) %}
+								<option value="{{ seance.film.title }}" {% if seance.film.title == filmFilter %} selected {% endif %}>{{ seance.film.title }}</option>
+							{% endif %}
+						{% endfor %}
+					</select>
+				</div>
+				<div class="col-md-6 mb-3">
+					<label for="dateFilter" class="form-label">Filtrer par date</label>
+					<select id="dateFilter" class="form-select" onchange="updateSeanceDisplay()">
+						<option value="">Toutes les dates</option>
+						{% set dates = [] %}
+						{% for seance in seances %}
+							{% set date = seance.dateHeureDebut|date('Y-m-d') %}
+							{% if date not in dates %}
+								{% set dates = dates | merge([date]) %}
+								<option value="{{ date }}" {% if date == dateFilter %} selected {% endif %}>{{ seance.dateHeureDebut|date('d/m/Y') }}</option>
+							{% endif %}
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
 
-        <!-- Section des séances disponibles -->
-        {{ form_start(form, {'attr': {'id': 'reservationForm', }}) }}
-        <div class="row mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.numPersons, {'label': 'Nombre de personnes','attr': {'class': 'form-control', 'onchange': 'enableSeanceSelection()'}}) }}
-            </div>
-        </div>
+		<!-- Section des séances disponibles -->
+		{{ form_start(form, {'attr': {'id': 'reservationForm'}}) }}
+		<div class="row mb-3">
+			<div class="col-md-6">
+				{{ form_row(form.numPersons, {'label': 'Nombre de personnes','attr': {'class': 'form-control', 'onchange': 'updateSeanceDisplay()'}}) }}
+			</div>
+		</div>
 
-        <div class="row" id="seancesContainer">
-            {% for seance in seances %}
-                <div class="col-md-4 mb-4 seance-card disabled"
-                     data-id="{{ seance.id }}"
-                     data-film="{{ seance.film.title }}"
-                     data-date="{{ seance.dateHeureDebut|date('Y-m-d') }}"
-                     data-places="{{ seance.getPlaceDisponible() }}"
-                     data-reserved-seats="{{ reservedSeatsBySeance[seance.id]|json_encode|e('html_attr') }}"
-                     onclick="toggleSelection(this)">
-                    <div class="card h-100 shadow-sm" style="cursor: pointer;">
-                        <div class="card-header bg-primary text-white">{{ seance.salle.cinema.ville }}</div>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ seance.film.title }}</h5>
-                            <p class="card-text">
-                                <strong>Date :</strong> {{ seance.dateHeureDebut|date('d/m/Y H:i') }}<br>
-                                <strong>Qualité :</strong> {{ seance.qualite }}<br>
-                                <strong>Places non réservées :</strong>
-                                <span class="places-available badge bg-success">{{ seance.getPlaceDisponible() }}</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="col-12 text-center">
-                    <p class="alert alert-warning">Aucune séance disponible</p>
-                </div>
-            {% endfor %}
-        </div>
+		<div class="row" id="seancesContainer">
+			{% for seance in seances %}
+				<div class="col-md-4 mb-4 seance-card disabled" data-id="{{ seance.id }}" data-film="{{ seance.film.title }}" data-date="{{ seance.dateHeureDebut|date('Y-m-d') }}" data-places="{{ seance.getPlaceDisponible() }}" data-reserved-seats="{{ reservedSeatsBySeance[seance.id]|json_encode|e('html_attr') }}" onclick="toggleSelection(this)">
+					<div class="card h-100 shadow-sm" style="cursor: pointer;">
+						<div class="card-header text-dark">{{ seance.salle.cinema.ville }}</div>
+						<div class="card-body">
+							<h5 class="card-title">{{ seance.film.title }}</h5>
+							<p class="card-text">
+								<strong>Date :</strong> {{ seance.dateHeureDebut|date('d/m/Y H:i') }}<br>
+								<strong>Qualité :</strong> {{ seance.qualite }}<br>
+								<strong>Places non réservées :</strong>
+								<span class="places-available badge bg-success">{{ seance.getPlaceDisponible() }}</span>
+							</p>
+						</div>
+					</div>
+				</div>
+			{% else %}
+				<div class="col-12 text-center">
+					<p class="alert alert-warning">Aucune séance disponible</p>
+				</div>
+			{% endfor %}
+		</div>
 
-        <!-- Champs cachés  -->
-        {{ form_row(form.seance, {'attr': {'id': 'reservation_seance', 'class': 'd-none'}}) }}
-        {{ form_row(form.seats, {'attr': {'id': 'reservation_seats', 'class': 'd-none'}}) }}
+		{{ form_row(form.seance, {'attr': {'id': 'reservation_seance', 'class': 'd-none'}}) }}
+		{{ form_row(form.seats, {'attr': {'id': 'reservation_seats', 'class': 'd-none'}}) }}
 
-        <div class="mt-4 text-center">
-            <h4>Places non réservées pour la séance sélectionnée :
-                <span id="placesAvailableDisplay">0</span>
-            </h4>
-        </div>
+		<div class="mt-4 text-center">
+			<h4>Places non réservées pour la séance sélectionnée : <span id="placesAvailableDisplay">0</span></h4>
+		</div>
 
-        <div id="seatSelection" class="mt-4 text-center"></div>
+		<div id="seatSelection" class="mt-4 text-center"></div>
 
-        <div class="text-center mt-4">
-            <button type="submit" id="reserve_button" class="btn btn-primary btn-lg" style="display: none;">Réserver</button>
-        </div>
-
-        {{ form_end(form) }}
-    </div>
+		<div class="text-center mt-4">
+			<button type="submit" id="reserve_button" class="btn btn-primary btn-lg" style="display: none;">Réserver</button>
+		</div>
+		{{ form_end(form) }}
+	</div>
 {% endblock %}
 
 {% block javascripts %}
-    <script>
-        // Autoriser la sélection des séances seulement après avoir renseigné numPersons
-        function enableSeanceSelection() {
-            const numPersons = document.getElementById('reservation_numPersons').value;
-            const seanceCards = document.querySelectorAll('.seance-card');
+<script>
+function updateSeanceDisplay() {
+    const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
+    const filmFilter = document.getElementById('filmFilter').value.toLowerCase();
+    const dateFilter = document.getElementById('dateFilter').value;
+    const seances = document.querySelectorAll('.seance-card');
 
-            seanceCards.forEach(card => {
-                if (numPersons > 0) {
-                    card.classList.remove('disabled');
-                    card.style.pointerEvents = 'auto';
-                    card.style.opacity = '1';
-                } else {
-                    card.classList.add('disabled');
-                    card.style.pointerEvents = 'none';
-                    card.style.opacity = '0.5';
-                }
-            });
+    seances.forEach(card => {
+        const filmTitle = card.getAttribute('data-film').toLowerCase();
+        const seanceDate = card.getAttribute('data-date');
+        const places = parseInt(card.getAttribute('data-places')) || 0;
+
+        const matchesFilm = filmFilter === "" || filmTitle.includes(filmFilter);
+        const matchesDate = dateFilter === "" || seanceDate === dateFilter;
+        const hasEnoughSeats = numPersons <= 0 || places >= numPersons;
+
+        const shouldShow = matchesFilm && matchesDate && hasEnoughSeats;
+
+        if (shouldShow) {
+            card.style.display = 'block';
+            card.classList.remove('disabled');
+            card.style.pointerEvents = 'auto';
+            card.style.opacity = '1';
+        } else {
+            card.style.display = 'none';
+            card.classList.add('disabled');
+            card.style.pointerEvents = 'none';
+            card.style.opacity = '0.5';
         }
+    });
 
-        function toggleSelection(card) {
-            const numPersons = document.getElementById('reservation_numPersons').value;
-            if (!numPersons || numPersons <= 0) {
-                alert("Veuillez d'abord saisir le nombre de personnes.");
-                return;
-            }
-
-            const placesAvailable = parseInt(card.getAttribute('data-places')) || 0;
-            if (placesAvailable <= 0) {
-                alert("Aucune place disponible pour cette séance.");
-                return;
-            }
-
-            // Vérifier si l'élément reservation_seance existe
-            const selectedSeancesInput = document.getElementById('reservation_seance');
-            if (!selectedSeancesInput) {
-                console.error("Champ 'reservation_seance' introuvable.");
-                alert("Erreur : impossible de sélectionner une séance. Veuillez recharger la page.");
-                return;
-            }
-
-            // Désélectionner toute autre séance
-            document.querySelectorAll('.seance-card .card').forEach(c => c.classList.remove('selected'));
-            card.querySelector('.card').classList.add('selected');
-
-            const seanceId = card.getAttribute('data-id');
-            const reservedSeats = JSON.parse(card.getAttribute('data-reserved-seats') || '[]');
-
-            // Définir la valeur pour l'input hidden
-            selectedSeancesInput.value = seanceId;
-
-            updatePlacesAvailable(placesAvailable, reservedSeats);
-
-            document.getElementById('reserve_button').style.display = 'block';
-        }
-
-        function updatePlacesAvailable(places, reservedSeats) {
-            const display = document.getElementById('placesAvailableDisplay');
-            const seatSelection = document.getElementById('seatSelection');
-            const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
-
-            display.textContent = places;
-            seatSelection.innerHTML = '';
-
-            if (places > 0 && places >= numPersons) {
-                const seatsPerRow = 8;
-                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                const totalSeats = places + reservedSeats.length;
-
-                for (let i = 0; i < totalSeats; i++) {
-                    const row = Math.floor(i / seatsPerRow);
-                    const col = (i % seatsPerRow) + 1;
-                    const seatLabel = alphabet[row] + col;
-
-                    const seatWrapper = document.createElement('div');
-                    seatWrapper.style.display = 'inline-block';
-                    seatWrapper.style.margin = '5px';
-                    seatWrapper.style.textAlign = 'center';
-
-                    const seat = document.createElement('input');
-                    seat.type = 'checkbox';
-                    seat.id = `seat${seatLabel}`;
-                    seat.name = 'seats[]';
-                    seat.value = seatLabel;
-                    seat.style.width = '20px';
-                    seat.style.height = '20px';
-
-                    // Si la place est réservée, la désactiver et la mettre en rouge
-                    if (reservedSeats.includes(seatLabel)) {
-                        seat.disabled = true;
-                        seat.style.backgroundColor = 'red';
-                        seat.style.cursor = 'not-allowed';
-                    }
-
-                    const label = document.createElement('label');
-                    label.setAttribute('for', `seat${seatLabel}`);
-                    label.textContent = seatLabel;
-                    label.style.display = 'block';
-                    label.style.fontSize = '12px';
-
-                    seatWrapper.appendChild(seat);
-                    seatWrapper.appendChild(label);
-                    seatSelection.appendChild(seatWrapper);
-
-                    if ((i + 1) % seatsPerRow === 0) {
-                        seatSelection.appendChild(document.createElement('br'));
-                    }
-                }
-                addSeatSelectionLimit();
-            } else {
-                seatSelection.innerHTML = '<p>Aucune place disponible ou nombre de personnes trop élevé.</p>';
-            }
-        }
-
-        function addSeatSelectionLimit() {
-            const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
-            const seats = document.querySelectorAll('input[name="seats[]"]');
-
-            seats.forEach(seat => {
-                seat.addEventListener('change', function () {
-                    const selectedSeats = document.querySelectorAll('input[name="seats[]"]:checked');
-                    if (selectedSeats.length > numPersons) {
-                        this.checked = false;
-                        alert(`Vous ne pouvez choisir que ${numPersons} siège(s).`);
-                    }
-                });
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('reservationForm');
-            if (!form) {
-                console.error("Formulaire 'reservationForm' introuvable.");
-                return;
-            }
-
-            form.addEventListener('submit', function (e) {
-                const selectedSeats = document.querySelectorAll('input[name="seats[]"]:checked');
-                const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
-
-                if (selectedSeats.length !== numPersons) {
-                    e.preventDefault();
-                    alert(`Veuillez sélectionner exactement ${numPersons} siège(s).`);
-                    return;
-                }
-
-                const seatsHiddenField = document.getElementById('reservation_seats');
-                const selectedSeatsArray = Array.from(selectedSeats).map(cb => cb.value);
-                seatsHiddenField.value = JSON.stringify(selectedSeatsArray);
-
-                console.log("Données envoyées:", {
-                    seance: document.getElementById('reservation_seance').value,
-                    seats: seatsHiddenField.value,
-                    numPersons: numPersons
-                });
-            });
-
-            // Appliquer les filtres au chargement
-            filterSeances();
-
-            console.log("reservation_seance au chargement:", document.getElementById('reservation_seance'));
-        });
-
-        function filterSeances() {
-            const filmFilter = document.getElementById('filmFilter').value.toLowerCase();
-            const dateFilter = document.getElementById('dateFilter').value;
-            const seances = document.querySelectorAll('.seance-card');
-
-            seances.forEach(seance => {
-                const filmTitle = seance.getAttribute('data-film').toLowerCase();
-                const seanceDate = seance.getAttribute('data-date');
-
-                const matchesFilm = filmFilter === "" || filmTitle.includes(filmFilter);
-                const matchesDate = dateFilter === "" || seanceDate === dateFilter;
-
-                if (matchesFilm && matchesDate) {
-                    seance.style.display = 'block';
-                } else {
-                    seance.style.display = 'none';
-                }
-            });
-        }
-    </script>
+    document.querySelectorAll('.seance-card .card').forEach(card => card.classList.remove('selected'));
+    document.getElementById('reservation_seance').value = '';
+    document.getElementById('reservation_seats').value = '';
+    document.getElementById('seatSelection').innerHTML = '';
+    document.getElementById('reserve_button').style.display = 'none';
+    document.getElementById('placesAvailableDisplay').textContent = '0';
+}
+	
+	        function toggleSelection(card) {
+	            const numPersons = document.getElementById('reservation_numPersons').value;
+	            if (!numPersons || numPersons <= 0) {
+	                alert("Veuillez d'abord saisir le nombre de personnes.");
+	                return;
+	            }
+	
+	            const placesAvailable = parseInt(card.getAttribute('data-places')) || 0;
+	            if (placesAvailable <= 0) {
+	                alert("Aucune place disponible pour cette séance.");
+	                return;
+	            }
+	
+	            // Vérifier si l'élément reservation_seance existe
+	            const selectedSeancesInput = document.getElementById('reservation_seance');
+	            if (!selectedSeancesInput) {
+	                console.error("Champ 'reservation_seance' introuvable.");
+	                alert("Erreur : impossible de sélectionner une séance. Veuillez recharger la page.");
+	                return;
+	            }
+	
+	            // Désélectionner toute autre séance
+	            document.querySelectorAll('.seance-card .card').forEach(c => c.classList.remove('selected'));
+	            card.querySelector('.card').classList.add('selected');
+	
+	            const seanceId = card.getAttribute('data-id');
+	            const reservedSeats = JSON.parse(card.getAttribute('data-reserved-seats') || '[]');
+	
+	            // Définir la valeur pour l'input hidden
+	            selectedSeancesInput.value = seanceId;
+	
+	            updatePlacesAvailable(placesAvailable, reservedSeats);
+	
+	            document.getElementById('reserve_button').style.display = 'block';
+	        }
+	
+	        function updatePlacesAvailable(places, reservedSeats) {
+	            const display = document.getElementById('placesAvailableDisplay');
+	            const seatSelection = document.getElementById('seatSelection');
+	            const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
+	
+	            display.textContent = places;
+	            seatSelection.innerHTML = '';
+	
+	            if (places > 0 && places >= numPersons) {
+	                const seatsPerRow = 8;
+	                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	                const totalSeats = places + reservedSeats.length;
+	
+	                for (let i = 0; i < totalSeats; i++) {
+	                    const row = Math.floor(i / seatsPerRow);
+	                    const col = (i % seatsPerRow) + 1;
+	                    const seatLabel = alphabet[row] + col;
+	
+	                    const seatWrapper = document.createElement('div');
+	                    seatWrapper.style.display = 'inline-block';
+	                    seatWrapper.style.margin = '5px';
+	                    seatWrapper.style.textAlign = 'center';
+	
+	                    const seat = document.createElement('input');
+	                    seat.type = 'checkbox';
+	                    seat.id = `seat${seatLabel}`;
+	                    seat.name = 'seats[]';
+	                    seat.value = seatLabel;
+	                    seat.style.width = '20px';
+	                    seat.style.height = '20px';
+	
+	                    // Si la place est réservée, la désactiver et la mettre en rouge
+	                    if (reservedSeats.includes(seatLabel)) {
+	                        seat.disabled = true;
+	                        seat.style.backgroundColor = 'red';
+	                        seat.style.cursor = 'not-allowed';
+	                    }
+	
+	                    const label = document.createElement('label');
+	                    label.setAttribute('for', `seat${seatLabel}`);
+	                    label.textContent = seatLabel;
+	                    label.style.display = 'block';
+	                    label.style.fontSize = '12px';
+	
+	                    seatWrapper.appendChild(seat);
+	                    seatWrapper.appendChild(label);
+	                    seatSelection.appendChild(seatWrapper);
+	
+	                    if ((i + 1) % seatsPerRow === 0) {
+	                        seatSelection.appendChild(document.createElement('br'));
+	                    }
+	                }
+	                addSeatSelectionLimit();
+	            } else {
+	                seatSelection.innerHTML = '<p>Aucune place disponible ou nombre de personnes trop élevé.</p>';
+	            }
+	        }
+	
+	        function addSeatSelectionLimit() {
+	            const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
+	            const seats = document.querySelectorAll('input[name="seats[]"]');
+	
+	            seats.forEach(seat => {
+	                seat.addEventListener('change', function () {
+	                    const selectedSeats = document.querySelectorAll('input[name="seats[]"]:checked');
+	                    if (selectedSeats.length > numPersons) {
+	                        this.checked = false;
+	                        alert(`Vous ne pouvez choisir que ${numPersons} siège(s).`);
+	                    }
+	                });
+	            });
+	        }
+	
+	        document.addEventListener('DOMContentLoaded', function () {
+	            const form = document.getElementById('reservationForm');
+	            if (!form) {
+	                console.error("Formulaire 'reservationForm' introuvable.");
+	                return;
+	            }
+	
+	            form.addEventListener('submit', function (e) {
+	                const selectedSeats = document.querySelectorAll('input[name="seats[]"]:checked');
+	                const numPersons = parseInt(document.getElementById('reservation_numPersons').value) || 0;
+	
+	                if (selectedSeats.length !== numPersons) {
+	                    e.preventDefault();
+	                    alert(`Veuillez sélectionner exactement ${numPersons} siège(s).`);
+	                    return;
+	                }
+	
+	                const seatsHiddenField = document.getElementById('reservation_seats');
+	                const selectedSeatsArray = Array.from(selectedSeats).map(cb => cb.value);
+	                seatsHiddenField.value = JSON.stringify(selectedSeatsArray);
+	
+	                console.log("Données envoyées:", {
+	                    seance: document.getElementById('reservation_seance').value,
+	                    seats: seatsHiddenField.value,
+	                    numPersons: numPersons
+	                });
+	            });
+	
+	            // Appliquer les filtres au chargement
+	            filterSeances();
+	
+	            console.log("reservation_seance au chargement:", document.getElementById('reservation_seance'));
+	        });
+	
+	        function filterSeances() {
+	            const filmFilter = document.getElementById('filmFilter').value.toLowerCase();
+	            const dateFilter = document.getElementById('dateFilter').value;
+	            const seances = document.querySelectorAll('.seance-card');
+	
+	            seances.forEach(seance => {
+	                const filmTitle = seance.getAttribute('data-film').toLowerCase();
+	                const seanceDate = seance.getAttribute('data-date');
+	
+	                const matchesFilm = filmFilter === "" || filmTitle.includes(filmFilter);
+	                const matchesDate = dateFilter === "" || seanceDate === dateFilter;
+	
+	                if (matchesFilm && matchesDate) {
+	                    seance.style.display = 'block';
+	                } else {
+	                    seance.style.display = 'none';
+	                }
+	            });
+	        }
+	    </script>
 {% endblock %}

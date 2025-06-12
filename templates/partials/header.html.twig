@@ -1,27 +1,40 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container">
-    <a class="navbar-brand" href="/">Cinéphoria</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-            data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" 
-            aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/films">Film</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/reservation">Réservation</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/contact">Contact</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/login">Connexion</a>
-        </li>
-      </ul>
-    </div>
-  </div>
+	<div class="container">
+		<a class="navbar-brand" href="/">Cinéphoria</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav ms-auto">
+				<li class="nav-item">
+					<a class="nav-link" aria-current="page" href="/films">Film</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/reservation">Réservation</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/contact">Contact</a>
+				</li>
+				{% if app.user %}
+					<li class="nav-item">
+						<a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
+					</li>
+					{% if is_granted('ROLE_ADMIN') %}
+						<li class="nav-item">
+							<a class="nav-link btn  ms-2" href="{{ path('admin_home') }}">Tableau de bord Admin</a>
+						</li>
+					{% elseif is_granted('ROLE_EMPLOYER') %}
+						<li class="nav-item">
+							<a class="nav-link btn  ms-2" href="{{ path('employe_home_index') }}">Tableau de bord Employé</a>
+						</li>
+					{% endif %}
+				{% else %}
+					<li class="nav-item">
+						<a class="nav-link" href="{{ path('app_login') }}">Connexion</a>
+					</li>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
 </nav>

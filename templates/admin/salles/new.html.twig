@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container mt-5">
         <div class="card shadow-lg">
-            <div class="card-header bg-primary text-white text-center">
+            <div class="card-header  text-white text-center">
                 <h2>Nouvelle Salle</h2>
             </div>
             <div class="card-body">
@@ -26,7 +26,10 @@
                     </div>
 
                    
-                    <button type="submit" class="btn btn-primary w-100">Ajouter</button>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('admin_salles_index') }}" class="btn btn-secondary">Retour</a>
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </div>
                 {{ form_end(form) }}
             </div>
         </div>

@@ -5,16 +5,16 @@
 {% block body %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Liste des Cinémas</h2>
+        <h2>Liste des Cinémas</h2>
         <a href="{{ path('admin_cinema_new') }}" class="btn btn-success">
-            <i class="fas fa-plus"></i> Ajouter un Cinéma
+             Ajouter un Cinéma
         </a>
     </div>
 
-    <div class="card shadow-lg border-0">
+    <div class="shadow-lg border-0">
         <div class="card-body">
             <table class="table table-striped table-hover">
-                <thead class="table-dark">
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nom</th>
@@ -29,7 +29,7 @@
                         <td>{{ cinema.nom }}</td>
                         <td>{{ cinema.ville }}</td>
                         <td class="text-center">
-                        <a href="{{ path('admin_cinema_edit', {'id': cinema.id}) }}" class="btn btn-warning btn-sm">
+                        <a href="{{ path('admin_cinema_edit', {'id': cinema.id}) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-edit"></i> Modifier
                         </a>
                         <form action="{{ path('admin_cinema_delete', {'id': cinema.id}) }}" method="post" style="display: inline-block;">

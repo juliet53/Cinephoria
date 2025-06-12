@@ -38,7 +38,7 @@ class Reservation
         return $this->placeReserve;
     }
 
-    public function setPlaceReserve(int $placeReserve): static
+    public function PlaceReserve(int $placeReserve): static
     {
         $this->placeReserve = $placeReserve;
 
@@ -62,7 +62,7 @@ class Reservation
         return $this->user;
     }
 
-    public function setUser(?User $user): static
+    public function setUserset(?User $user): static
     {
         $this->user = $user;
 

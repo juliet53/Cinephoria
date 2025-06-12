@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FilmRepository::class)]
 #[Vich\Uploadable]
@@ -19,6 +20,7 @@ class Film
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $title = null;
 
     #[ORM\Column(type: "text", nullable: true)]
@@ -261,7 +263,6 @@ class Film
     }
     // Remove the existing declaration of the $updatedAt property
 
-    // Ajoutez les getters et setters pour la propriété $updatedAt
 
     public function getUpdatedAt(): ?\DateTimeImmutable
     {

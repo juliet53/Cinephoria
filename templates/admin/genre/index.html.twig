@@ -21,7 +21,7 @@
                     <tr>
                         <td>{{ genre.nom }}</td>
                         <td>
-                            <a href="{{ path('admin_genre_edit', {'id': genre.id}) }}" class="btn btn-warning">Modifier</a>
+                            <a href="{{ path('admin_genre_edit', {'id': genre.id}) }}" class="btn btn-primary">Modifier</a>
                             <a href="{{ path('admin_genre_delete', {'id': genre.id}) }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce genre ?')">Supprimer</a>
                         </td>
                     </tr>

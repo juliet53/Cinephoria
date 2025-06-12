@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container mt-5">
         <h1>Liste des Séances</h1>
-        <a href="{{ path('admin_seance_new') }}" class="btn btn-primary mb-3">Ajouter une Séance</a>
+        <a href="{{ path('admin_seance_new') }}" class="btn btn-success mb-3">Ajouter une Séance</a>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -26,9 +26,9 @@
                         <td>{{ seance.qualite }}</td>
                         <td>{{ seance.film.title }}</td>
                         <td>{{ seance.salle.numero }}</td>
-                        <td>{{ seance.prix|number_format(2, '.', ',') }} €</td> <!-- Affichage du prix -->
+                        <td>{{ seance.prix|number_format(2, '.', ',') }} €</td> 
                         <td>
-                            <a href="{{ path('admin_seance_edit', {'id': seance.id}) }}" class="btn btn-warning btn-sm">Éditer</a>
+                            <a href="{{ path('admin_seance_edit', {'id': seance.id}) }}" class="btn btn-primary btn-sm">Éditer</a>
                             <form method="POST" action="{{ path('admin_seance_delete', {'id': seance.id}) }}" style="display:inline;">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ seance.id) }}">
                                 <button class="btn btn-danger btn-sm" type="submit" onclick="return confirm('Voulez-vous vraiment supprimer cette séance ?')">Supprimer</button>

@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container mt-5">
         <div class="card shadow-lg">
-            <div class="card-header bg-warning text-white text-center">
+            <div class="card-header  text-white text-center">
                 <h2>Modifier la Salle #{{ salle.id }}</h2>
             </div>
             <div class="card-body">
@@ -30,7 +30,7 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="{{ path('admin_salles_index') }}" class="btn btn-secondary">Retour</a>
-                        <button type="submit" class="btn btn-warning">Enregistrer</button>
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
                     </div>
                 {{ form_end(form) }}
             </div>
